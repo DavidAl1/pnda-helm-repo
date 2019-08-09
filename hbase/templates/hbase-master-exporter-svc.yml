@@ -1,0 +1,17 @@
+{{- if .Values.prometheus.jmx.enabled }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-hbase-master-metric
+  namespace: {{ .Release.Namespace }}
+  labels:
+    monitoring: prometheus
+spec: 
+  selector: 
+    app: {{ include "hbase.name" . }}
+    component: master
+  ports:
+  - port: {{ .Values.prometheus.jmx.port }}
+    name: metrics
+    targetPort: {{ .Values.prometheus.jmx.port }}
+{{- end }}

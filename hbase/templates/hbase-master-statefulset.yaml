@@ -42,6 +42,28 @@ spec:
         {{- end }}
       terminationGracePeriodSeconds: 0
       containers:
+      {{- if .Values.prometheus.jmx.enabled }}
+      - name: master-jmx-exporter
+        image: "{{ .Values.prometheus.jmx.image }}:{{ .Values.prometheus.jmx.imageTag }}"
+        command:
+        - java
+        - -XX:+UnlockExperimentalVMOptions
+        - -XX:+UseCGroupMemoryLimitForHeap
+        - -XX:MaxRAMFraction=1
+        - -XshowSettings:vm
+        - -jar
+        - jmx_prometheus_httpserver.jar
+        - {{ .Values.prometheus.jmx.port | quote }}
+        - /etc/jmx-hbase/hbase_jmx_config.yaml
+        ports:
+        - containerPort: {{ .Values.prometheus.jmx.port }}
+        resources:
+{{ toYaml .Values.prometheus.jmx.resources | indent 10 }}
+        volumeMounts:
+        - name: pnda-hbase-exporter-javaagent
+          mountPath: /etc/jmx-hbase/hbase_jmx_config.yaml
+          subPath: hbase_jmx_config.yaml       
+      {{- end }}
       - name: master
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
@@ -66,7 +88,19 @@ spec:
         volumeMounts:
         - name: hbase-config
           mountPath: /tmp/hbase-config
+        {{- if .Values.prometheus.jmx.enabled }}
+        - name: pnda-hbase-master-env
+          mountPath: /opt/hbase-2.0.1/conf
+        {{- end }}
       volumes:
       - name: hbase-config
         configMap:
           name: {{ .Release.Name }}-hbase
+      {{- if .Values.prometheus.jmx.enabled }}
+      - name: pnda-hbase-exporter-javaagent
+        configMap:
+          name: {{ .Release.Name }}-hbase-exporter-javaagent
+      - name: pnda-hbase-master-env
+        configMap:
+          name: {{ .Release.Name }}-hbase-master-env
+      {{- end }}

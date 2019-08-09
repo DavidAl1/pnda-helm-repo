@@ -37,3 +37,19 @@ hbase:
       limits:
         memory: "2048Mi"
         cpu: "1000m"
+  
+## ------------------------------------------------------
+## Monitoring HBase
+## ------------------------------------------------------
+
+## Prometheus Exporter Configuration
+## ref: https://prometheus.io/docs/instrumenting/exporters/
+prometheus:
+  ## JMX Configuration
+  ## ref: https://github.com/prometheus/jmx_exporter -- https://hub.docker.com/r/solsson/kafka-prometheus-jmx-exporter
+  ## Using same image than cp-Kafka jmx
+  jmx:
+    enabled: true
+    image: solsson/kafka-prometheus-jmx-exporter@sha256
+    imageTag: 6f82e2b0464f50da8104acd7363fb9b995001ddff77d248379f8788e78946143
+    port: 5556

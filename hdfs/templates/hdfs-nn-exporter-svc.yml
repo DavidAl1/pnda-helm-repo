@@ -2,7 +2,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: hdfs-nn-metric
+  name: {{ include "hdfs.fullname" . }}-namenode-metric
   labels:
     monitoring: prometheus
 spec: 

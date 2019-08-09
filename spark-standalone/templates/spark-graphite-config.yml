@@ -1,3 +1,4 @@
+{{- if .Values.master.prometheus.exporter.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -16,5 +17,4 @@ data:
     master.source.jvm.class=org.apache.spark.metrics.source.JvmSource
     worker.source.jvm.class=org.apache.spark.metrics.source.JvmSource
     driver.source.jvm.class=org.apache.spark.metrics.source.JvmSource
-
-
+    {{- end }}
